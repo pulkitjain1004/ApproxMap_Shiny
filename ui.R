@@ -1,7 +1,7 @@
 library(shiny)
 
 ui <- fluidPage(
-  theme = "bootstrap.css",
+  theme = "bootstrap2.css",
   tags$h1("ApproxMap"),
   fluidRow(
     column(4, tags$h2("Steps")),
