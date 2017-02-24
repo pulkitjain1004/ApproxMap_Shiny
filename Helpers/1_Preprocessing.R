@@ -45,6 +45,82 @@ insert_blankItemset_before_Wseq = function(Wseq) {
 }
 
 
+#function to change date format
+ord_date = function(data1, pd, st.date=1) { #st.date = start date #pd = period
+  #pd = 1; st.date = 1; st.date = 2
+  
+  # (1) specify the format for the inputs  
+  # (i) data
+  data1 = data.frame(data1) #form the data as data frame format
+  colnames(data1) = c("ID", "Date", "Item")
+  data1 = data1[order(data1$ID, data1$Date),]
+  data1$Date = as.Date(data1$Date, "%m/%d/%Y")
+  #data.class(data1$Date)
+  
+  id.list = split(data1, data1$ID) #split data for each ID
+  #data.class(id.list)
+  
+  for (i in 1:length(id.list)) {
+    
+    # (ii) period
+    # period = 1: weekly
+    #          2: calendar monthly 
+    #          3: quaterly of a year 
+    #          4: twice of a year
+    #          5: annual
+    
+    # (iii) start date
+    # for period = 1, start date: Sun=1 < Mon=2 < ... < Sat=6
+    # for period = 4,             1, ..., 12
+    # for period = 5,             1, ..., 12
+    
+    # (2) get the number for each period: dif.date
+    if (pd == 1) {
+      st.date = st.date - 7*(st.date > wday(min(id.list[[i]]$Date)))
+      r.st.date = min(id.list[[i]]$Date) - wday(min(id.list[[i]]$Date)) + st.date #real start date
+      dif.day = as.numeric(id.list[[i]]$Date - r.st.date) #day difference
+      dif.date = dif.day %/% 7 + 1
+    }
+    else if (pd == 2) {
+      fst.date = c(year(min(id.list[[i]]$Date)), month(min(id.list[[i]]$Date)))
+      ym.mat = matrix(c(year(id.list[[i]]$Date), month(id.list[[i]]$Date)), ncol=2)
+      dif.mat = ym.mat - matrix(fst.date, byrow=T, nrow=nrow(ym.mat), ncol=2) #year & month difference
+      dif.date = dif.mat[,1]*12 + dif.mat[,2] + 1
+    }
+    else if (pd == 3) {
+      fst.date = c(year(min(id.list[[i]]$Date)), quarter(min(id.list[[i]]$Date)))
+      ym.mat = matrix(c(year(id.list[[i]]$Date), quarter(id.list[[i]]$Date)), ncol=2)
+      dif.mat = ym.mat - matrix(fst.date, byrow=T, nrow=nrow(ym.mat), ncol=2) #year & month difference
+      dif.date = dif.mat[,1]*4 + dif.mat[,2] + 1
+    }
+    else if (pd == 4) {
+      st.month = st.date - 6*(st.date > month(min(id.list[[i]]$Date)))
+      r.st.date = c(year(min(id.list[[i]]$Date)), st.month) #real start date
+      ym.mat = matrix(c(year(id.list[[i]]$Date), month(id.list[[i]]$Date)), ncol=2)
+      dif.mat = ym.mat - matrix(r.st.date, byrow=T, nrow=nrow(ym.mat), ncol=2) 
+      dif.mon = dif.mat[,1]*12 + dif.mat[,2] #month difference
+      dif.date = dif.mon %/% 6 + 1
+    }
+    else if (pd == 5) {
+      st.year = year(min(id.list[[i]]$Date)) - (st.date > month(min(id.list[[i]]$Date)))
+      r.st.date = c(st.year, st.date) #real start date
+      ym.mat = matrix(c(year(id.list[[i]]$Date), month(id.list[[i]]$Date)), ncol=2)
+      dif.mat = ym.mat - matrix(r.st.date, byrow=T, nrow=nrow(ym.mat), ncol=2)
+      dif.mon = dif.mat[,1]*12 + dif.mat[,2] #month difference
+      dif.date = dif.mon %/% 12 + 1
+    }
+    
+    # (3) output
+    id.list[[i]]$Date = dif.date
+  }
+  
+  data1 = ldply(id.list, data.frame)[,-1]
+  data1 = data1[order(data1$ID, data1$Date),]
+  
+  
+  
+  return(data1)
+}
 
 
 
