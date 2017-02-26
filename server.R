@@ -5,6 +5,7 @@ source("./Helpers/2_calculate_dist_and_cost.R")
 source("./Helpers/3_alignments.R")
 source("./Helpers/4_clustering.R")
 source("./Helpers/5_ApproxMap.R")
+source("./Helpers/5.1_FormattingOutput.R")
 
 
 server <- function(input, output, session) {
@@ -60,7 +61,7 @@ server <- function(input, output, session) {
   }
   )
   
-  output$approxMapInfo = renderPrint(approxMap())
+  output$approxMapInfo = renderPrint(approxMap()[[2]])
   
 }
 
