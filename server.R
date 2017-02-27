@@ -55,11 +55,13 @@ server <- function(input, output, session) {
   
   ProcessInpAndGetApproxMap = function() {
     
-      Seqs = data_uploaded()
-      Seqs = Seqs[,-1]
-      inp2 = process_Input(as.character(Seqs$Seqs), id = Seqs$id, Itemset_regex  = "[\\{*}]")
-      results <- get_approxMap(inp2, input$numKNN, input$slidCutoff)
-      return(results)
+      # Seqs = data_uploaded()
+      # Seqs = Seqs[,-1]
+      # inp2 = process_Input(as.character(Seqs$Seqs), id = Seqs$id, Itemset_regex  = "[\\{*}]")
+      # results <- get_approxMap(inp2, input$numKNN, input$slidCutoff)
+      inp = cvt_seq(data_uploaded(),pd = 1)
+      results = get_approxMap(inp,input$numKNN, input$slidCutoff)
+      return(results$formatted_results)
     
   }
   
