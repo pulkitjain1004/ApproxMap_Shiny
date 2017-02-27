@@ -1,8 +1,10 @@
+library(shiny)
+library(shinydashboard)
 library(devtools)
 install_github("ilangurudev/ApproxMapSeq")
 library(ApproxMapSeq)
-library(shiny)
-library(shinydashboard)
+
+source("./Helpers/Helpers.R")
 
 server <- function(input, output, session) {
   
@@ -56,7 +58,8 @@ server <- function(input, output, session) {
     
     inp = cvt_seq(data_uploaded(),pd = 1)
     results = get_approxMap(inp,input$numKNN, input$slidCutoff)
-    return(results$formatted_results)
+    format_output(results)
+    #return(results$formatted_results)
   }
   
   approxMap <- eventReactive(input$but_AppMap,ProcessInpAndGetApproxMap())

@@ -5,7 +5,7 @@ format_output = function(approxmap_obj) {
   
   for(i in 1:length(clusters)) {
     
-    cat(paste("Cluster ",i,":",sep = ""),"\n","Cluster IDs: ", clusters[[i]], "\n", "Weighted Sequence: ", form_wseq[[i]], "\n", "Consensus Pattern: ", form_cons[[i]],"\n\n")
+    cat(paste("Cluster ",i,":",sep = ""),"\n","Sequence IDs: ", clusters[[i]], "\n", "Weighted Sequence: ", form_wseq[[i]], "\n", "Consensus Pattern: ", form_cons[[i]],"\n\n")
   }
   
 }
