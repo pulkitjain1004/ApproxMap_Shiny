@@ -1,14 +1,8 @@
+library(devtools)
+install_github("ilangurudev/ApproxMapSeq")
+library(ApproxMapSeq)
 library(shiny)
 library(shinydashboard)
-library(lubridate)
-source("./Helpers/1_Preprocessing.R")
-source("./Helpers/2_calculate_dist_and_cost.R")
-source("./Helpers/3_alignments.R")
-source("./Helpers/4_clustering.R")
-source("./Helpers/5_ApproxMap.R")
-#source("./Helpers/6_orddatefunction.R")
-#source("./Helpers/7_testorddatefunction.R")
-
 
 server <- function(input, output, session) {
   

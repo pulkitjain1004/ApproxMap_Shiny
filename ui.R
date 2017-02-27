@@ -14,11 +14,6 @@ ui <- fluidPage(
       wellPanel(
         fileInput(inputId = "inp_data",label = "1. Upload File")
       ),
-      
-       wellPanel(
-        fileInput(inputId = "inp_dataL",label = "1. Upload File L")
-      ),
-      
      
       wellPanel(
        
@@ -73,10 +68,10 @@ ui <- fluidPage(
       ),
       
       wellPanel(
-        numericInput(inputId = "numKNN", label = "2. Enter number of nearest neighbours", value=1),  
-     # ),
+        numericInput(inputId = "numKNN", label = "2. Enter number of nearest neighbours", value=1)
+      ),
       
-      #wellPanel(
+      wellPanel(
         sliderInput(inputId = "slidCutoff", label = "3. Select cutoff", min = 0, max = 1,value = 0.5)
       ),
      
