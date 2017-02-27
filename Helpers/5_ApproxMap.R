@@ -38,7 +38,5 @@ get_approxMap = function(seqList,k,strength, id = 1) {
     consensus_patterns[[i]] = cluster_pattern
   }
 
-  formatted_con_pat = lapply(consensus_patterns, get_consensus_formatted)
-  results = list(consensus_patterns = consensus_patterns, formatted_results = formatted_con_pat)
-  return(results)
+  return(noquote(consensus_patterns))
 }

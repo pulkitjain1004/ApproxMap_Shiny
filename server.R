@@ -1,14 +1,28 @@
 library(shiny)
 library(shinydashboard)
+library(lubridate)
 source("./Helpers/1_Preprocessing.R")
 source("./Helpers/2_calculate_dist_and_cost.R")
 source("./Helpers/3_alignments.R")
 source("./Helpers/4_clustering.R")
 source("./Helpers/5_ApproxMap.R")
-source("./Helpers/5.1_FormattingOutput.R")
+#source("./Helpers/6_orddatefunction.R")
+#source("./Helpers/7_testorddatefunction.R")
 
 
 server <- function(input, output, session) {
+  
+  output$text1 <- renderText({ 
+    "Start day is predefined (First day of every calender month)"
+  })
+  
+  output$text2 <- renderText({ 
+    "Start day is predefined (Jan 1, Apr 1, July 1, Oct 1)"
+  })
+  
+  data_uploadedL = isolate(input$inp_dataL)
+  
+  
   
   data_uploaded = reactive(
     {
@@ -61,7 +75,7 @@ server <- function(input, output, session) {
   }
   )
   
-  output$approxMapInfo = renderPrint(approxMap()[[2]])
+  output$approxMapInfo = renderPrint(approxMap())
   
 }
 
