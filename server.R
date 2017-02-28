@@ -8,7 +8,7 @@ library(tidyverse)
 
 source("./Helpers/Helpers.R")
 
-data_uploaded = read.csv("./data/demo1.csv")
+#data_uploaded = read.csv("./data/demo1.csv")
 
 server <- function(input, output, session) {
   
@@ -34,13 +34,17 @@ server <- function(input, output, session) {
     }
   )
   
-  output$contents <- renderTable(head(data_uploaded()))
+  output$contents <- renderTable({
+    if(is.null(data_uploaded())) {
+      return("Upload data to view here")
+    } else {
+      return(head(data_uploaded()))
+    }
+    })
   
   output$processedOut <- renderPrint(
     {
-      if(is.null(data_uploaded()))
-        return(NULL)
-      else
+      if(!is.null(data_uploaded()))
         return(str(data_uploaded()))
     }
   )
@@ -75,8 +79,12 @@ server <- function(input, output, session) {
       tabs = sapply(1:nTabs, function(x) paste0("Cluster",as.character(x)))
       newTabs = lapply(tabs, function(x) {
         tabPanel(title = x,
-                 tags$h3(textOutput(outputId = paste(x,"_info",sep=""))),
-                 plotOutput(outputId = paste(x,"_plot",sep=""))
+                 tags$h3("Weighted Sequence"), tags$br(),
+                 tags$h4(textOutput(outputId = paste(x,"_wseq",sep=""))),tags$br(),
+                 tags$h3("Frequency Plot"), tags$br(),
+                 plotOutput(outputId = paste(x,"_plot",sep="")), tags$br(),
+                 tags$h3("Consensus Pattern"), tags$br(),
+                 tags$h4(textOutput(outputId = paste(x,"_cons",sep=""))),tags$br()
                  #textInput(inputId = "xxx",value = "xxx",label="xxx")
         )
       }
@@ -90,10 +98,12 @@ server <- function(input, output, session) {
   observe({
   nTabs = length(approxmap_obj()$clusters) 
   lapply(1:nTabs,function(x) {
-    inf = paste0("Cluster",x,"_info")
+    wseq = paste0("Cluster",x,"_wseq")
     plt = paste0("Cluster",x,"_plot")
-    output[[inf]] <- renderPrint(cat(approxmap_obj()$formatted_results$weighted_seq[[x]]))
+    cons = paste0("Cluster",x,"_cons")
+    output[[wseq]] <- renderPrint(cat(approxmap_obj()$formatted_results$weighted_seq[[x]]))
     output[[plt]] <- renderPlot(plot_frequency(approxmap_obj()$weighted_seqs[[x]],input$slidCutoff))
+    output[[cons]] <- renderPrint(cat(approxmap_obj()$formatted_results$consensus[[x]]))
   })
   }
   )
