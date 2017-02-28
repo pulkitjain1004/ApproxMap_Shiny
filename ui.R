@@ -68,11 +68,11 @@ ui <- fluidPage(
       ),
       
       wellPanel(
-        numericInput(inputId = "numKNN", label = "2. Enter number of nearest neighbours", value=1)
+        numericInput(inputId = "numKNN", label = "2. Enter number of nearest neighbours", value=2)
       ),
       
       wellPanel(
-        sliderInput(inputId = "slidCutoff", label = "3. Select cutoff", min = 0, max = 1,value = 0.5)
+        sliderInput(inputId = "slidCutoff", label = "3. Select cutoff", min = 0, max = 1,value = 0.4)
       ),
      
      
@@ -82,6 +82,7 @@ ui <- fluidPage(
         tags$strong("4. Get ApproxMap"),
         tags$br(),
         actionButton(inputId = "but_AppMap", label = "Calculate")
+        #actionButton(inputId = "but_Display", label = "Display")
       )
       
     ),
@@ -99,7 +100,7 @@ ui <- fluidPage(
                  ),
         
         tabPanel("Consensus Patterns",
-                 verbatimTextOutput(outputId = "approxMapInfo")
+                 uiOutput(outputId = "approxMapInfo")
         )
         
         
