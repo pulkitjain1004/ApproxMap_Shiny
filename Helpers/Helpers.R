@@ -18,17 +18,19 @@ extract_freq = function(weighted_seq) {
 }
 
 
-plot_frequency = function(weighted_seq, threshhold =0.5) {
+plot_frequency = function(weighted_seq, cons_threshhold =0.5, noise_threshold = 0, variation_threshold = 0.2) {
   #n_thresh = threshhold * (length(weighted_seq)-1)
-  n_thresh = threshhold * weighted_seq$n
+  n_thresh = cons_threshhold * weighted_seq$n
+  v_thresh = variation_threshold * weighted_seq$n
   fq = extract_freq(weighted_seq)
-  freq_plot <- fq %>% dplyr::mutate(element_number = 1:nrow(fq)) %>%  
+  freq_plot <- fq %>% dplyr::mutate(element_number = 1:nrow(fq)) %>%  filter(element_weights > noise_threshold) %>% 
     ggplot2::ggplot(aes(x = element_number, y = element_weights, text = elements)) + 
       ggplot2::geom_point(size = 0.75) + 
         ggplot2::geom_path(group = 1, size=0.1) +
-          ggplot2::geom_hline(yintercept = n_thresh) +
-            ggplot2::theme(legend.position="none") +
-              ggplot2::geom_label(aes(label = elements,size = element_weights))
+          ggplot2::geom_hline(yintercept = n_thresh, linetype = 2) +
+            ggplot2::geom_hline(yintercept = v_thresh, linetype = 4) +
+              ggplot2::theme(legend.position="none") +
+                ggplot2::geom_label(aes(label = elements,size = element_weights))
   return(freq_plot)
 }
 

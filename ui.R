@@ -72,7 +72,10 @@ ui <- fluidPage(
       ),
       
       wellPanel(
-        sliderInput(inputId = "slidCutoff", label = "3. Select cutoff", min = 0, max = 1,value = 0.4)
+        tags$h4("3. Cutoffs"), tags$br(),
+        numericInput(inputId = "noise_cutoff", label = "Noise Cutoff", value = 0), tags$br(),
+        sliderInput(inputId = "var_cutoff", label = "Variation Cutoff", min = 0, max = 1,value = 0.2),tags$br(),
+        sliderInput(inputId = "cons_cutoff", label = "Consensus Cutoff", min = 0, max = 1,value = 0.4),tags$br()
       ),
      
      
