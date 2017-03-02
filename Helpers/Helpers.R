@@ -42,6 +42,7 @@ get_Itemset_Formatted_HTML = function(W_itemset_html, add_itemset_weight = T) {
   result = ifelse(add_itemset_weight,paste("( ",collapsed," ) : ",W_itemset_html$itemset_weight,sep=""),paste("(",collapsed,")",sep=""))
   return(result)
 }
+
 get_Wseq_Formatted_HTML = function(W_seq, add_itemset_weight = T, no_white_space=T) {
   n = W_seq$n
   W_seq$n = NULL
@@ -68,6 +69,22 @@ get_tagged_itemsets_from_wseq = function(wseq) {
   
   return(wseq)
 }
+
+tag_items = function(itemset_with_tags) {
+  itemset_with_tags$elements = paste0(itemset_with_tags$start_tag,itemset_with_tags$elements,itemset_with_tags$end_tag)
+  return(itemset_with_tags)
+}
+
+get_consensus_formatted_HTML <- function(weighted_seq, strength) {
+  n = weighted_seq$n
+  weighted_seq$n = NULL
+  W_seq_html = get_tagged_itemsets_from_wseq(weighted_seq)
+  tagged_items_wseq <- lapply(W_seq_html, tag_items)
+  tagged_items_wseq$n = n
+  return(get_consensus_formatted(get_consensus_pattern(tagged_items_wseq,strength)))
+}
+
+
 
 
 
