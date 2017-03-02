@@ -1,8 +1,43 @@
 library(shiny)
+library(shinythemes)
 library(lubridate)
 
 ui <- fluidPage(
-  theme = "bootstrap3.css",
+  #theme = "bootstrap3.css",
+  shinythemes::themeSelector(),
+  tags$head(
+      tags$style(
+        HTML("
+                priority1 {
+                  font-size: 75%;
+                  color: #7DCEA0;
+                }
+                priority2 {
+                  font-size: 100%;
+                  color: #52BE80;
+                }
+                priority3 {
+                  font-size: 125%;
+                  color: #27AE60;
+                }
+                priority4 {
+                  font-size: 150%;
+                  color: #229954;
+                }
+                priority5 {
+                  font-size: 175%;
+                  color: #1E8449;
+                  font-weight: bold;
+                }
+
+                #results_panels {
+                  background-color: white;
+                }
+             
+            ")
+                )
+            ),
+  
   tags$h1("ApproxMap"),
   fluidRow(
     column(4, tags$h2("Steps")),
@@ -12,11 +47,11 @@ ui <- fluidPage(
     sidebarPanel(
       
       wellPanel(
-        fileInput(inputId = "inp_data",label = "1. Upload File")
+        fileInput(inputId = "inp_data", label = tags$h4("1. File Upload"))
       ),
      
       wellPanel(
-       
+        tags$h4("2. Data Aggregation"), tags$br(),
         #dateInput(inputId = "st.date",label = "Enter Starting Date for Data",format = "mm-dd-yyyy", startview = "month", weekstart = 0),
         
         
@@ -68,11 +103,12 @@ ui <- fluidPage(
       ),
       
       wellPanel(
-        numericInput(inputId = "numKNN", label = "2. Enter number of nearest neighbours", value=2)
+        tags$h4("3. Clustering (kNN)"), tags$br(),
+        numericInput(inputId = "numKNN", label = "Enter number of nearest neighbours(k)", value=2)
       ),
       
       wellPanel(
-        tags$h4("3. Cutoffs"), tags$br(),
+        tags$h4("4. Cutoffs"), tags$br(),
         numericInput(inputId = "noise_cutoff", label = "Noise Cutoff", value = 0), tags$br(),
         sliderInput(inputId = "var_cutoff", label = "Variation Cutoff", min = 0, max = 1,value = 0.2),tags$br(),
         sliderInput(inputId = "cons_cutoff", label = "Consensus Cutoff", min = 0, max = 1,value = 0.4),tags$br()
@@ -82,10 +118,8 @@ ui <- fluidPage(
      
      
      wellPanel(
-        tags$strong("4. Get ApproxMap"),
-        tags$br(),
+        tags$h4("5. Get ApproxMap"), tags$br(),
         actionButton(inputId = "but_AppMap", label = "Calculate")
-        #actionButton(inputId = "but_Display", label = "Display")
       )
       
     ),
@@ -98,8 +132,8 @@ ui <- fluidPage(
                  verbatimTextOutput(outputId = "processedOut")
                  ),
         
-        tabPanel("Clusters"
-                 #verbatimTextOutput(outputId = "ClusterInfo")
+        tabPanel("Clusters",
+                 htmlOutput(outputId = "test")
                  ),
         
         tabPanel("Consensus Patterns",

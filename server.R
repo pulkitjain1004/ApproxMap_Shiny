@@ -5,7 +5,6 @@ install_github("ilangurudev/ApproxMapSeq")
 library(ApproxMapSeq)
 library(tidyverse)
 
-
 source("./Helpers/Helpers.R")
 
 #data_uploaded = read.csv("./data/demo1.csv")
@@ -77,19 +76,20 @@ server <- function(input, output, session) {
       nTabs = length(approxmap_obj()$clusters) 
       #tabs = c("Overview",paste("Cluster", as.character(1:nTabs)))
       tabs = sapply(1:nTabs, function(x) paste0("Cluster",as.character(x)))
-      newTabs = lapply(tabs, function(x) {
-        tabPanel(title = x,
-                 wellPanel(
-                 tags$h3("Weighted Sequence:"), tags$br(),
-                 tags$h4(textOutput(outputId = paste(x,"_wseq",sep=""))),tags$br()),
-                 wellPanel(
-                 tags$h3("Frequency Plot:"), tags$br(),
-                 #numericInput(inputId = paste0(x,"_noise_cutoff"), label = "Noise Cutoff", value = 0),
-                 #sliderInput(inputId = paste0(x,"_var_slid"), label = "Select threshold for variation pattern", min = 0, max = input$slidCutoff, value = 0.5 *input$slidCutoff),
-                 plotOutput(outputId = paste(x,"_plot",sep="")), tags$br()),
-                 wellPanel(
-                 tags$h3("Consensus Pattern:"), tags$br(),
-                 tags$h4(textOutput(outputId = paste(x,"_cons",sep=""))),tags$br())
+      n = unlist(lapply(approxmap_obj()$weighted_seqs, function(wseq) wseq$n))
+      newTabs = lapply(1:nTabs, function(x) {
+        tabPanel(title = paste0("Cluster ",x," (n=",n[x],")"),
+                 wellPanel(id = "results_panels",
+                   tags$h3("Patterns:"), tags$br(),
+                   tags$h4("Consensus Pattern: "),tags$h4(textOutput(outputId = paste(tabs[x],"_cons",sep=""))),tags$br(),
+                   tags$h4("Variation Pattern: "),tags$h4(textOutput(outputId = paste(tabs[x],"_var",sep=""))),tags$br()
+                   ),
+                 wellPanel(id = "results_panels",
+                   tags$h3("Frequency Plot:"), tags$br(),
+                   plotOutput(outputId = paste(tabs[x],"_plot",sep="")), tags$br()),
+                 wellPanel(id = "results_panels",
+                   tags$h3("Weighted Sequence:"), tags$br(),
+                   tags$h4(htmlOutput(outputId = paste(tabs[x],"_wseq",sep=""))),tags$br())
                  # wellPanel(
                  #   tags$h3("Variation Pattern:"), tags$br(),
                  #   tags$h4(textOutput(outputId = paste(x,"_var",sep=""))),tags$br())
@@ -105,17 +105,49 @@ server <- function(input, output, session) {
   observe({
   nTabs = length(approxmap_obj()$clusters) 
   lapply(1:nTabs,function(x) {
-    wseq = paste0("Cluster",x,"_wseq")
-    plt = paste0("Cluster",x,"_plot")
-    cons = paste0("Cluster",x,"_cons")
-    output[[wseq]] <- renderPrint(cat(approxmap_obj()$formatted_results$weighted_seq[[x]]))
-    output[[plt]] <- renderPlot(plot_frequency(approxmap_obj()$weighted_seqs[[x]],input$cons_cutoff, input$noise_cutoff, input$var_cutoff))
-    output[[cons]] <- renderPrint(cat(approxmap_obj()$formatted_results$consensus[[x]]))
+    # wseq = paste0("Cluster",x,"_wseq")
+    # plt = paste0("Cluster",x,"_plot")
+    # cons = paste0("Cluster",x,"_cons")
+    #output[[wseq]] <- renderPrint(cat(approxmap_obj()$formatted_results$weighted_seq[[x]]))
+    output[[paste0("Cluster",x,"_wseq")]] <- renderPrint(cat(get_Wseq_Formatted_HTML(approxmap_obj()$weighted_seqs[[x]])))
+    output[[paste0("Cluster",x,"_plot")]] <- renderPlot(plot_frequency(approxmap_obj()$weighted_seqs[[x]],input$cons_cutoff, input$noise_cutoff, input$var_cutoff))
+    output[[paste0("Cluster",x,"_cons")]] <- renderPrint(cat(approxmap_obj()$formatted_results$consensus[[x]]))
+    var_pat = get_consensus_formatted(get_consensus_pattern(approxmap_obj()$weighted_seqs[[x]],input$var_cutoff))
+    output[[paste0("Cluster",x,"_var")]] <- renderPrint(cat(var_pat))
   })
   }
   )
   
-  #,input$slidCutoff, output[[paste0("Cluster",x,"_noise_cutoff")]],output[[paste0("Cluster",x,"_var_slid")]]
-   
+  observeEvent(input$cons_cutoff,{
+    if(!is.null(approxmap_obj())) {
+      nTabs = length(approxmap_obj()$clusters) 
+      lapply(1:nTabs,function(x) {
+        cons = paste0("Cluster",x,"_cons")
+        cons_pat <- get_consensus_pattern(approxmap_obj()$weighted_seqs[[x]],input$cons_cutoff)
+        output[[cons]] <- renderPrint(cat(get_consensus_formatted(cons_pat)))
+      })
+       
+    }
+  })
+  
+  observeEvent(input$var_cutoff,{
+    if(!is.null(approxmap_obj())) {
+      nTabs = length(approxmap_obj()$clusters)
+      lapply(1:nTabs,function(x) {
+        var = paste0("Cluster",x,"_var")
+        var_pat <- get_consensus_pattern(approxmap_obj()$weighted_seqs[[x]],input$var_cutoff)
+        output[[var]] <- renderPrint(cat(get_consensus_formatted(var_pat)))
+      })
+
+    }
+  })
+  
+  observe({
+    updateSliderInput(session,inputId = "cons_cutoff", min = input$var_cutoff, max = 1, value = (1 + input$var_cutoff)/2)
+  })
+  
+  #output$test <- renderText(paste("<font color=\"red\" size=10>This is some text!</font>"))
+  output$test <- renderText(paste("<priority1>This is some text!</priority1>"))
+  #priority1
 }
      

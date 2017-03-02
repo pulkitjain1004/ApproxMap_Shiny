@@ -35,4 +35,39 @@ plot_frequency = function(weighted_seq, cons_threshhold =0.5, noise_threshold = 
 }
 
 
+get_Itemset_Formatted_HTML = function(W_itemset_html, add_itemset_weight = T) {
+  with_weights = paste(W_itemset_html$elements,W_itemset_html$element_weights,sep = " : ")
+  with_tags = paste0(W_itemset_html$start_tag,with_weights,W_itemset_html$end_tag)
+  collapsed = paste(with_tags,collapse = ", ")
+  result = ifelse(add_itemset_weight,paste("( ",collapsed," ) : ",W_itemset_html$itemset_weight,sep=""),paste("(",collapsed,")",sep=""))
+  return(result)
+}
+get_Wseq_Formatted_HTML = function(W_seq, add_itemset_weight = T, no_white_space=T) {
+  n = W_seq$n
+  W_seq$n = NULL
+  W_seq_html = get_tagged_itemsets_from_wseq(W_seq)
+  formatted_itemsets = lapply(W_seq_html,get_Itemset_Formatted_HTML, add_itemset_weight)
+  formatted_itemsets = paste(formatted_itemsets, collapse = " ")
+  result = paste("< ", formatted_itemsets," > : " , n,sep = "")
+  if(no_white_space) result = gsub(" ","",result)
+  return(result)
+}
+
+get_tagged_itemsets_from_wseq = function(wseq) {
+  wseq$n = NULL
+  weights = unlist(lapply(wseq, function(x) x$element_weights))
+  range = range(weights)
+  block_size = diff(range)/5
+  blocks = seq(range[1],range[2],by = block_size)
+  wseq = lapply(wseq, function(w_itemset) {
+    block_no = cut(w_itemset$element_weights,breaks = blocks, labels = F, include.lowest = T)
+    w_itemset$start_tag = paste0("<priority",block_no,">")
+    w_itemset$end_tag = paste0("</priority",block_no,">")
+    return(w_itemset)
+  })
+  
+  return(wseq)
+}
+
+
 
